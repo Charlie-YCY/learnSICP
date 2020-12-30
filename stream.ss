@@ -164,3 +164,4 @@
             (else (iter (stream_cdr ps)))))
     (iter primes))
 
+(define integrate_series ())
