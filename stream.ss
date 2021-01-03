@@ -91,9 +91,9 @@
 ; (define (prime? n)
 ;     (= n (smallest_divisor n)))
 
-(stream_car (stream_cdr
-        (stream_filter prime?
-            (stream_enumerate_interval 10000 100000))))
+; (stream_car (stream_cdr
+;         (stream_filter prime?
+;             (stream_enumerate_interval 10000 100000))))
 
 (define (stream_map proc . argstreams)
     (if (stream_null? (car argstreams))
@@ -164,4 +164,9 @@
             (else (iter (stream_cdr ps)))))
     (iter primes))
 
-(define integrate_series ())
+(define integrate_series (s)
+    (let (n 0)
+        (
+            (cons_stream (stream_car s) )
+        ))
+    )
