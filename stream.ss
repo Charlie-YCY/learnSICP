@@ -36,11 +36,6 @@
 
 (define the_empty_stream '() )
 
-(define (stream_map proc s)
-    (if (stream_null? s)
-        the_empty_stream
-        (cons_stream (proc (stream_car s))
-                    (stream_map proc (stream_cdr s)))))
 
 (define (stream_for_each proc s)
     (if (stream_null? s)
@@ -164,9 +159,21 @@
             (else (iter (stream_cdr ps)))))
     (iter primes))
 
-(define integrate_series (s)
-    (let (n 0)
-        (
-            (cons_stream (stream_car s) )
-        ))
-    )
+(define (integrate_series s)
+    (stream_map * (stream_map (lambda (x) (/ 1 x)) integers) s))
+
+(define exp_series
+    (cons_stream 1 (integrate_series exp_series)))
+
+; (define (integrate-series s)
+;               (stream-map /  s integers))
+
+
+; 错误
+; (define cosine_series
+;     (cons_stream 1 (integrate_series (integrate_series cosine_series))))
+
+ (define cosine_series
+     (cons_stream 1 (stream_map  - (integrate_series sine_series))))
+ (define sine_series
+     (cons_stream 0 (integrate_series cosine_series)))
