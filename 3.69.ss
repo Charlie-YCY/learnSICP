@@ -118,26 +118,20 @@
                              (pairs (stream_cdr s) (stream_cdr t)))))
 
 
-; (define (triples s t u)
-;         (cons_stream (list (stream_car s) (stream_car t) (stream_car u))
-;                      (interleave
-;                         (stream_map (lambda (x) (cons (stream_car s) x))
-;                                     (stream_cdr (pairs t u))
-;                         (triples (stream_cdr s)
-;                                 (stream_cdr t)
-;                                 (stream_cdr u))))))
 (define (triples s t u)
-    (cons_stream (list (stream_car s) (stream_car t) (stream_car u))
-                 (interleave (stream_map (lambda (x) (cons (stream_car s) x))
-                                         (stream_map (lambda (x) (list (stream_car t) x))
-                                                     (stream_cdr u)))
-                             (triples (stream_cdr s) (stream_cdr t) (stream_cdr u)))))
+        (cons_stream (list (stream_car s) (stream_car t) (stream_car u))
+                       (interleave
+                        (stream_map (lambda (x) (cons (car s) x)) (stream_cdr (pairs t u)))
+                        (triples (stream_cdr s)
+                                (stream_cdr t)
+                                (stream_cdr u)))))
+
 
 (define tnumbers (triples integers integers integers))
 (define pfilter (lambda (x) (= (square (caddr x))
                                            (+ (square (car x)) (square (cadr x))))))
-;phythagorean_numbers返回函数
-(define (phythagorean_numbers)
-            (stream_filter (lambda (x) (= (square (caddr x))
-                                           (+ (square (car x)) (square (cadr x)))))
+
+; (define testfilter (lambda (x) (= (car x) 1)))
+(define phythagorean_numbers
+            (stream_filter pfilter
                            tnumbers))

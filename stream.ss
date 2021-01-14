@@ -318,30 +318,24 @@
 ;             (rec (stre_m_cdr si) (1+ i) ptu top-i))))
 ;      (rec s 1 pairs-tu first-of-integer-pair)))
 
-; (define (pythagorean? a b c)
-;     (= (square c)
-;         (+ (square a) (square b))))
+(define (pythagorean? a b c)
+    (= (square c)
+        (+ (square a) (square b))))
 
-;  (define triples-integers
-;    (triples integers integers integers))
+ (define triples-integers
+   (triples integers integers integers))
 
-; (define pythagorean-triples
-;     (stream_filter
-;         (lambda (triple)
-;             (apply pythagorean? triple))
-;         triples-integers))
+(define pythagorean-triples
+    (stream_filter
+        (lambda (triple)
+            (apply pythagorean? triple))
+        triples-integers))
 
-(define (triples s t u)
-        (cons_stream (list (stream_car s) (stream_car t) (stream_car u))
-                     (interleave
-                        (stream_map (lambda (x) (cons (stream_car s) x))
-                                    (stream_cdr (pairs t u))
-                        (triples (stream_cdr s)
-                                (stream_cdr t)
-                                (stream_cdr u))))))
-(define (phythagorean_numbers)
-            (define (square x) (* x x))
-            (define numbers (triples integers integers integers))
-            (stream_filter (lambda (x)　(= (square (caddr x))
-                                           (+ (square (car x)) (square (cadr x)))))
-                           numbers))
+; (define (triples s t u)
+;         (cons_stream (list (stream_car s) (stream_car t) (stream_car u))
+;                      (interleave
+;                         (stream_map (lambda (x) (cons (stream_car s) x))
+;                                     (stream_cdr (pairs t u))
+;                         (triples (stream_cdr s)
+;                                 (stream_cdr t)
+;                                 (stream_cdr u))))))
