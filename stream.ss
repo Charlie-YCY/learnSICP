@@ -78,10 +78,10 @@
 
 (define (stream_filter pred stream)
     (cond ((stream_null? stream) the_empty_stream)
-        ((pred (stream_car stream))
-            (cons_stream (stream_car stream)
-                (stream_filter pred (stream_cdr stream))))
-        (else (stream_filter pred (stream_cdr stream)))))
+          ((pred (stream_car stream))
+              (cons_stream (stream_car stream)
+                           (stream_filter pred (stream_cdr stream))))
+          (else (stream_filter pred (stream_cdr stream)))))
 
 
 (define (smallest_divisor n)
@@ -125,6 +125,10 @@
 (define ones (cons_stream 1 ones))
 (define integers
     (cons_stream 1 (add_streams ones integers)))
+
+(define no_seven
+    (stream_filter (lambda (x)  (not (divides?  7 x)))
+                   integers))
 
 (define (mul_streams s1 s2)
     (stream_map * s1 s2))
@@ -286,7 +290,6 @@
     (pairs (stream_cdr s) t))))
 
 (define (triples s t u)
-    ; (pairs (pairs s t) u))
     (cons_stream (list (stream_car s) (stream_car t) (stream_car u))
                  (interleave (stream_map (lambda (x) (list (stream_car s) (car x) (car (cdr x))))
                                          (stream_map (lambda (x) (list (stream_car t) x))
@@ -300,19 +303,45 @@
 
 ; (define pythagoras
 ;     (stream_filter pythagoras_filter (triples integers integers integers)))
-(define (pythagorean? a b c)
-    (= (square c)
-        (+ (square a) (square b))))
 
- (define triples-integers
-   (triples integers integers integers))
+;  (define first-of-integer-pair
+;    (stre_m_map car (pairs integers integers)))
 
-(define pythagorean-triples
-    (delay    (stream_filter
-        (lambda (triple)
-            (apply pythagorean? triple))
-        triples-integers)))
+;  (define (triples s t u)
+;    (let ((pairs-tu (pairs t u))) ;; compute pairs only *once*
+;      (define (rec si i ptu top-i)
+;        (co_s_stream
+;         (cons (stream_car si) (stream_car ptu))
+;         (if (= i (stream_car top-i))
+;             (rec s 1 (stream_cdr ptu) (stre_m_cdr top-i))
+;             ;; restart s cycle with next ptu
+;             (rec (stre_m_cdr si) (1+ i) ptu top-i))))
+;      (rec s 1 pairs-tu first-of-integer-pair)))
 
-(define no_seven
-    (stream_filter (lambda (x) (not (divides? x 7)))
-    integers))
+; (define (pythagorean? a b c)
+;     (= (square c)
+;         (+ (square a) (square b))))
+
+;  (define triples-integers
+;    (triples integers integers integers))
+
+; (define pythagorean-triples
+;     (stream_filter
+;         (lambda (triple)
+;             (apply pythagorean? triple))
+;         triples-integers))
+
+(define (triples s t u)
+        (cons_stream (list (stream_car s) (stream_car t) (stream_car u))
+                     (interleave
+                        (stream_map (lambda (x) (cons (stream_car s) x))
+                                    (stream_cdr (pairs t u))
+                        (triples (stream_cdr s)
+                                (stream_cdr t)
+                                (stream_cdr u))))))
+(define (phythagorean_numbers)
+            (define (square x) (* x x))
+            (define numbers (triples integers integers integers))
+            (stream_filter (lambda (x)　(= (square (caddr x))
+                                           (+ (square (car x)) (square (cadr x)))))
+                           numbers))
