@@ -54,7 +54,7 @@
                 (stream_for_each proc (stream_cdr s)))))
 
 (define (display_stream s)
-    (stream_for_each display_separate s))
+    (stream_for_each display_line s))
 
 (define (display_line x)
     (newline)
@@ -269,6 +269,13 @@
                                          (stream_cdr t))
                              (pairs (stream_cdr s) (stream_cdr t)))))
 
+(define (weighted_pairs s t)
+    (cons_stream (list (stream_car s) (stream_car t))
+                 (merge_weighted (stream_map (lambda (x) (list (stream_car s) x))
+                                             (stream_cdr t))
+                                 (weighted_pairs (stream_cdr s) (stream_cdr t)) sum_weight)))
+  
+
 (define (pairs2 s t)
     (cons_stream
         (list (stream_car s ) (stream_car t))
@@ -289,12 +296,6 @@
                 (stream_cdr t))
     (pairs (stream_cdr s) t))))
 
-(define (triples s t u)
-    (cons_stream (list (stream_car s) (stream_car t) (stream_car u))
-                 (interleave (stream_map (lambda (x) (list (stream_car s) (car x) (car (cdr x))))
-                                         (stream_map (lambda (x) (list (stream_car t) x))
-                                                     (stream_cdr u)))
-                             (triples (stream_cdr s) (stream_cdr t) (stream_cdr u)))))
 
 ; (define (pythagoras_filter s)
 ;     (= (+ (square (car s))
@@ -318,18 +319,18 @@
 ;             (rec (stre_m_cdr si) (1+ i) ptu top-i))))
 ;      (rec s 1 pairs-tu first-of-integer-pair)))
 
-(define (pythagorean? a b c)
-    (= (square c)
-        (+ (square a) (square b))))
+; (define (pythagorean? a b c)
+;     (= (square c)
+;         (+ (square a) (square b))))
 
- (define triples-integers
-   (triples integers integers integers))
+;  (define triples-integers
+;    (triples integers integers integers))
 
-(define pythagorean-triples
-    (stream_filter
-        (lambda (triple)
-            (apply pythagorean? triple))
-        triples-integers))
+; (define pythagorean-triples
+;     (stream_filter
+;         (lambda (triple)
+;             (apply pythagorean? triple))
+;         triples-integers))
 
 ; (define (triples s t u)
 ;         (cons_stream (list (stream_car s) (stream_car t) (stream_car u))
@@ -339,3 +340,38 @@
 ;                         (triples (stream_cdr s)
 ;                                 (stream_cdr t)
 ;                                 (stream_cdr u))))))
+(define (triples s t u)
+        (cons_stream (list (stream_car s) (stream_car t) (stream_car u))
+                       (interleave
+                        (stream_map (lambda (x) (cons (car s) x)) (stream_cdr (pairs t u)))
+                        (triples (stream_cdr s)
+                                (stream_cdr t)
+                                (stream_cdr u)))))
+((define (triple_seighted x y)
+    ))
+
+
+(define tnumbers (triples integers integers integers))
+(define pfilter (lambda (x) (= (square (caddr x))
+                                           (+ (square (car x)) (square (cadr x))))))
+
+; (define testfilter (lambda (x) (= (car x) 1)))
+(define phythagorean_numbers
+            (stream_filter pfilter
+                           tnumbers))
+
+(define (sum_weight x)
+    (if (null? x)
+        0
+        (+ (car x) (sum_weight (cdr x)))))
+(define selfnumber
+    (lambda (x) x))
+
+(define (merge_weighted x y weight)
+    (cond ((stream_null? x) y)
+          ((stream_null? y) x)
+          (else
+            (let ((xcar (stream_car x)) (ycar (stream_car y)))
+                 (if (< (weight xcar) (weight ycar))
+                        (cons_stream xcar (merge_weighted (stream_cdr x) y weight))
+                     (cons_stream ycar (merge_weighted x (stream_cdr y) weight)))))))
