@@ -347,8 +347,13 @@
                         (triples (stream_cdr s)
                                 (stream_cdr t)
                                 (stream_cdr u)))))
-((define (triple_seighted x y)
-    ))
+(define (triples_weighted s t u)
+        (cons_stream (list (stream_car s) (stream_car t) (stream_car u))
+                       (merge_weighted
+                        (stream_map (lambda (x) (cons (car s) x)) (stream_cdr (weighted_pairs t u)))
+                        (triples_weighted (stream_cdr s)
+                                (stream_cdr t)
+                                (stream_cdr u)) sum_weight)))
 
 
 (define tnumbers (triples integers integers integers))
@@ -359,6 +364,8 @@
 (define phythagorean_numbers
             (stream_filter pfilter
                            tnumbers))
+(define phythagorean_numbers_weighted
+            (stream_filter pfilter (triples_weighted integers integers integers)))
 
 (define (sum_weight x)
     (if (null? x)
@@ -366,6 +373,10 @@
         (+ (car x) (sum_weight (cdr x)))))
 (define selfnumber
     (lambda (x) x))
+
+(define (streamsweight x weight)
+    (stream_map weight x))
+; (display_stream (streamsweight phythagorean_numbers_weighted sum_weight))
 
 (define (merge_weighted x y weight)
     (cond ((stream_null? x) y)
@@ -375,3 +386,4 @@
                  (if (< (weight xcar) (weight ycar))
                         (cons_stream xcar (merge_weighted (stream_cdr x) y weight))
                      (cons_stream ycar (merge_weighted x (stream_cdr y) weight)))))))
+
