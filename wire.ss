@@ -7,4 +7,4 @@
 (define (front-queue queue)
     (if (empty-queue? queue)
     (assertion-violation  "front-queue" "it's an empty queue!"  queue)
-    (car (front-ptr queue)))
+    (car (front-ptr queue))))
