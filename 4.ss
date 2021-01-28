@@ -1,7 +1,21 @@
 ;(load "D:/AAAprograms_codes/learnSICP/4.ss")
 (define true #t)
 (define false #f)
-(define apply_in_underlying_scheme apply)
+(define apply_in_underlying_scheme
+    apply)
+
+(define (apply procedure arguments)
+    (cond ((primitive_procedure? procedure)
+                      (apply_primitive_procedure procedure arguments))
+          ((compound_procedure? procedure)
+                (begin (display "M_eval  apply compound procedure")
+                    (eval_sequence
+                            (procedure_body procedure)
+                            (extend_environment
+                                    (procedure_parameters procedure)
+                                    arguments
+                                    (procedure_environment procedure)))))
+          (else (error 'apply "IN M eval Unknown procedure type -- Apply" procedure arguments))))
 
 (define (eval exp env)
     (cond ((self_evaluating? exp) exp)
@@ -21,17 +35,6 @@
                 (apply (eval (operator exp) env)
                        (list_of_values (operands exp) env)))
           (else (error 'eval "IN M eval Unknow expression type! --EVAL" exp))))
-(define (apply procedure arguments)
-    (cond ((primitive_procedure? procedure)
-                (apply_primitive_procedure procedure arguments))
-          ((compound_procedure? procedure)
-                (eval_sequence
-                        (procedure_body procedure)
-                (extend_environment
-                        (procedure_parameters procedure)
-                        arguments
-                        (procedure_environment procedure))))
-          (else (error 'apply "IN M eval Unknown procedure type -- Apply" procedure arguments))))
 
 (define (list_of_values exps env)
     (if (no_operands? exps)
@@ -213,13 +216,15 @@
              primitive_procedures))
 (define (setup_environment)
         (let ((initial_env
-              (extend_environment (primitive_procedure_names)
+                     (extend_environment (primitive_procedure_names)
                                   (primitive_procedure_objects) the_empty_environment)))
              (define_variable! 'true true initial_env)
              (define_variable! 'false false initial_env)
              initial_env))
 (define the_global_environment (setup_environment))
 (define (primitive_procedure? proc)
+        ; (display "primitive_procedure?")
+        ; (display proc)
         (tagged_list? proc 'primitive))
 (define (primitive_implementation proc) (cadr proc))
 
@@ -248,7 +253,7 @@
                             '<procedure_env>))
             (display object)))
 
-(define the_global_environment (setup_environment))
+; (define the_global_environment (setup_environment))
 (driver_loop)
 
 
